@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="common.JDBConnect" %>    
+<%@ page import="common.JDBConnect" %> 
+<%@ page import="common.JDBConnPool" %>   
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,5 +29,20 @@
 		JDBConnect jdbc3 = new JDBConnect(application);
 		jdbc3.close();
 	%>
+			<h2>JDBC Connection Pool test</h2>
+	<%
+		JDBConnPool pool = new JDBConnPool();
+		pool.close();
+	%>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </body>
 </html>
