@@ -1,7 +1,5 @@
 package membership;
 
-import java.sql.SQLException;
-
 import common.JDBConnect;
 
 public class MemberDAO extends JDBConnect {

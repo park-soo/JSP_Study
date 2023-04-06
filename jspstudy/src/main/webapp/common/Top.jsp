@@ -8,6 +8,7 @@
 		<%}else{ %>
 			<a href="../07LoginOutPrac/Logout.jsp">로그아웃</a>
 		<% } %>
+			<a href="../08M1Board/List.jsp">게시판</a>
 		</td>
 	</tr>
 </table>
