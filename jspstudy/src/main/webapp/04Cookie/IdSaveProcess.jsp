@@ -19,7 +19,7 @@
 		
 	}else {
 		//로그인 실패
-		AlertFunc.alertBack(response,"로그인에 실패했습니다.");
+		AlertFunc.alertBack("로그인에 실패했습니다.",out);
 		
 	}
 %>

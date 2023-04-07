@@ -61,6 +61,44 @@ public class BoardDAO extends JDBConnect {
 		return bl;
 	}
 	
+	// 페이지별 게시물 읽어오기
+	public List<BoardDTO> getListPage(Map<String, Object> param){
+		List<BoardDTO> bl = new Vector<BoardDTO>();
+		String sql = "SELECT * FROM ( "
+						+ "SELECT ROWNUM PNUM, S.* FROM( "
+						+ "SELECT B.* FROM BOARD B";
+		if(param.get("findWord")!=null) {
+			sql += " where " +param.get("findCol")+" like '%"+param.get("findWord")+"%'";
+		}
+		sql+=" 				order by num desc"
+						+	") s"
+						+")"
+						+"where pnum between ? and ?";
+		
+		try {
+			psmt = con.prepareStatement(sql);
+			psmt.setString(1, param.get("start").toString());
+			psmt.setString(2, param.get("end").toString());
+			rs=psmt.executeQuery();
+			while(rs.next()) {
+				BoardDTO dto = new BoardDTO();
+				dto.setNum(rs.getString("num"));
+				dto.setTitle(rs.getString("title"));
+				dto.setContent(rs.getString("content"));
+				dto.setPostdate(rs.getDate("postdate"));
+				dto.setId(rs.getString("id"));
+				dto.setVisitcount(rs.getString("visitcount"));
+				bl.add(dto);
+			}
+		}catch(Exception e) {
+			System.out.println("게시물 목록 읽는 중 에러");
+			e.printStackTrace();
+		}
+		
+		return bl;
+	}
+
+	
 	//게시물 작성
 	public int insertWrite(BoardDTO dto) {
 		int res=0;

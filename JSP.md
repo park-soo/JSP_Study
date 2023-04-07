@@ -97,18 +97,53 @@ System.out.println("Return : " + ret );
 Return : 2
 ```
 
-statement 정적
-preparedStatement 동적
+## Action Tag
 
-ActionTag
+JSP 표준태그<br>
+XML 표준문법(반드시 종료 태그. 태그 사이 주석X)<br>
+표현식(<%= %>)
 
-VO
-DTO
+```jsp
+<jsp:include> : 외부 파일을 현재 파일에 포함
+지시어 <%@ include file="path" %>
+액션태그 지시어
+표현식 가능 불가능
+결과만 포함 하나의 페이지로 포함
+변수 별개 하나의 페이지 변수
+page 공유X 공유O
 
-DAO
 
-Design pattern
+<jsp:forward> : 다른 페이지로 요청(request)를 넘김<br>
+request.getRequestDispatcher().forward(request, response)<br>
+<jsp:useBean>,<jsp:setProperty>,<jsp:getProperty><br>
+: 자바빈즈 생성 값 할당 불러오기<br>
+<jsp:useBean id="구분자" class="대상클래스" scope="기본값 page/저장될 영역"/><br>
+<jsp:setProperty name="자바빈즈 id" property="속성명(멤버변수명)" value="저장값"/><br>
+<jsp:getProperty name="자바빈즈 id" property="속성명(멤버변수명)"/><br>
+<jsp:param> : 다른 페이지로 매개변수 전달<br>
+<jsp:include> <jsp:forward> 함께 사용<br>
+화면이동<br>
+<jsp:forward>
+requestDispatcher().forward()<br>
+javascript location.href() , location.replace<br>
+response.sendRedirect<br>
 
-model 1
+<meta http-equiv=refresh content="시간; url=목적지"><br>
+```
 
-model 2 (MVC model)
+## EL
+
+EL<br>
+Expression language 표현 언어
+
+<%= %>
+
+변수나 메서드의 값을 출력할 때 사용하는 스크립트 언어<br>
+4가지 영역(page, request, session, appliction) 속성 값<br>
+내장 객체의 속성을 사용<br>
+산술, 비교, 논리 연산 호출 사용<br>
+자바에 정의된 메서드 호출 가능<br>
+
+${속성}<br>
+액션태그나 JSTL 혼용 가능<br>
+jsp 스크립트 요소(선언부, 표현식, 스크립틀릿) 혼용 불가
