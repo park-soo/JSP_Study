@@ -147,3 +147,403 @@ Expression language 표현 언어
 ${속성}<br>
 액션태그나 JSTL 혼용 가능<br>
 jsp 스크립트 요소(선언부, 표현식, 스크립틀릿) 혼용 불가
+
+## JSTL
+
+JSP Standard tag library
+
+````
+jsp에서 빈번하게 사용하는 반복문 조건문을 처리하는 동작을 모아 표준으로 만든 태그 라이브러리
+	종류					기능								접두어(prefix)
+	core				변수 선언 조건문 반복문 url 처리		     c
+	formatting			숫자, 날짜, 시간 포멧 지정				    fmt
+	xml					xml parsing						           x
+	function			컬렉션, 문자열 처리					        fn
+	sql					데이터베이스 연결 및 쿼리 실행			     sql
+    ```
+````
+
+## CORE
+
+-   Catch : 자바에서 try-catch 구문과 동일한 기능(에러가 발생할 수 있는 부분에 있어서 에러 메시지를 출력하는 코드)
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+	<%
+		int num1=200;
+	%>
+	<c:catch var="eMsg">
+		<%
+			int res = num1/0;
+		%>
+	</c:catch>
+	예외: ${eMsg }<br/>
+	<c:set var="num2" value="400"/>
+	<c:catch var="eMsg">
+		${"일"+num2 }
+	</c:catch>
+	예외:${eMsg }
+</body>
+```
+
+-   Choose : 여러 조건중에 해당하는 조건에 맞는 처리를 할 수 있다. when 태그를 사용하여 현재의 조건에 부합하는지 여부를 확인하고, 최종적으로는 otherwise를 통해서 Default 처리를 할 수도 있다. 자바에에서는 CASE 와 같은 동작을 한다고 생각하면 이해하기 쉬울 것 같다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+	<c:set var="num" value="99"/>
+
+	<h4>choose</h4>
+	<c:choose>
+		<c:when test="${num mod 2 eq 0 }">
+			${num }는 짝수입니다.
+		</c:when>
+		<c:otherwise>
+			${num }는 홀수입니다.
+		</c:otherwise>
+	</c:choose>
+</body>
+```
+
+-   ForEach : 자바프로그램의 for 문에 해당하는 기능을 제공하는 커스텀액션이다. 즉 이 액션을 이용하면 특정 HTML코드를 일정 횟수만큼 반복해서 출력할 수 있다.
+    -   향상된 for문도 있다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+<h4>일반 for문</h4>
+	<c:forEach var="i" begin="1" end="3" step="1">
+		<p>반복${i}</p>
+	</c:forEach>
+
+	<h4>반복문 속성</h4>
+	<table border="1">
+	<c:forEach begin="3" end="7" var="i" varStatus="loop">
+		<tr>
+			<td>count:${loop.count }</td>		<!-- 반복순서 -->
+			<td>index:${loop.index }</td>		<!-- ? -->
+			<td>current:${loop.current }</td>	<!-- 현재값 -->
+			<td>first:${loop.first }</td>		<!-- 처음인지 여부  -->
+			<td>last:${loop.last }</td>			<!-- 마지막인지 여부 -->
+			<td>i:${i }</td>
+		</tr>
+	</c:forEach>
+	</table>
+	<h4>enhanced(향상된) for문</h4>
+	<%
+		String[] rainbow={"빨","주","노","초","파","남","보"};
+	%>
+	<c:forEach items="<%=rainbow %>" var="color">
+		<span>${color }</span>
+	</c:forEach>
+	<%
+		String[] rainbow2={"red","orange","yellow","green","blue","navy","purple"};
+	%>
+		<h4>반복문 속성</h4>
+	<table border="1">
+	<c:forEach items="<%=rainbow2 %>" var="color" varStatus="loop">
+		<tr>
+			<td>count:${loop.count }</td>		<!-- 반복순서 -->
+			<td>index:${loop.index }</td>		<!-- 인덱스 -->
+			<td>current:${loop.current }</td>	<!-- 인덱스의 실제 요소 -->
+			<td>first:${loop.first }</td>		<!-- 처음인지 여부  -->
+			<td>last:${loop.last }</td>			<!-- 마지막인지 여부 -->
+			<td style="color:${color};">color:${color}</td>
+		</tr>
+	</c:forEach>
+</body>
+```
+
+-   ForTokens : 구분 기호를 이용하여 구분기호를 제외한 문자열들을 출력하고, 구분 기호를 제외하고 forEach 루프와 비슷하다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+	<%
+		String rainbow ="red,orange,yellow,green,blue,navy,purple";
+	%>
+	<c:forTokens items="<%=rainbow %>" delims="," var="color">
+		<span style="color:${color }">${color }</span>
+	</c:forTokens>
+</body>
+```
+
+-   If : 조건문.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+<c:set var="number" value="100"/>
+	<c:set var="string" value="JSP"/>
+
+	<c:if test="${number mod 2 eq 0 }" var="result" scope="request">
+		${number }는 짝수입니다.<br>
+	</c:if>
+
+		result:${result }<br>
+
+	<c:if test="100">
+		EL이 아닌 정수를 지정하면 false
+	</c:if>
+
+	<c:if test="${string eq 'Java' }" var="result2">
+		문자열은 java입니다.<br>
+	</c:if>
+
+	<c:if test="${not result2 }">
+		문자열이 java가 아닙니다.<br>
+	</c:if>
+
+	<c:if test="tRuE" var="result3">
+		대소문자 구분없이 "tRuE"인 경우 true<br>
+	</c:if>
+		result:${result3 }<br>
+
+	<c:if test=" ${ true } " var="result4">
+		EL 양쪽에 공백이 존재하면 false <br>
+	</c:if>
+		result:${result4}<br>
+
+	<c:if test="${string eq 'Java' }">
+		문자열은 java입니다.<br>
+	</c:if>
+	<c:if test="${string eq 'JSP' }" >
+		문자열은 JSP입니다.<br>
+	</c:if>
+</body>
+```
+
+-   Import : 동적 페이지 호출 include랑 비슷
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+	<c:set var="reqVar" value="park" scope="request"/>
+	<c:import url="./include/OtherPage.jsp" var="contents">
+		<c:param name="param1" value="JSP"/>
+		<c:param name="param2" value="JAVA"/>
+	</c:import>
+	<h4>다른 문서 삽입하기</h4>
+	${contents}
+	<c:import url="./include/OtherPage.jsp">
+		<c:param name="param1" value="ultra"/>
+		<c:param name="param2" value="super"/>
+	</c:import>
+	<iframe src="./include/OuterPage.jsp" style="width:100%; height:600px;"></iframe>
+</body>
+```
+
+-   Out : 자바에서의 System.out.println 메서드, JSP와 비슷한 역할을 가지고 있습니다. 어떤 값을 입력받던지 간에 콘솔이 아닌 화면에 문자열로 바꾸어서 보여주는 역할입니다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+	<c:set var="iTag">
+		i 태그는 <i>기울임</i>을 표현합니다.
+	</c:set>
+	<h4>기본 사용</h4>
+	<c:out value="${iTag }"/>
+	<br>
+	${iTag }
+
+	<h4>escapeXml 속성</h4>
+	<c:out value="${iTag }" escapeXml="false"/>
+	<br>
+
+	<c:out value="${param.name }" default="이름 없음"/>
+	<c:out value="" default="빈 문자열도 값으로 처리"/>
+
+	</body>
+```
+
+-   Redirect : response.sendRedirect()와 같이 url 지정해 특정 페이지로 리다이렉트를 시켜주는 기능을 합니다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+	<c:set var="reqVar" value="park" scope="request"/>
+	<c:redirect url="./include/OtherPage.jsp">
+		<c:param name="param1" value="orange"/>
+		<c:param name="param2" value="lemon"/>
+	</c:redirect>
+	</body>
+```
+
+-   Remove : Scope(저장영역)에 값을 삭제할 수 있도록 해줍니다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!-- 변수 선언 -->
+<c:set var="scopeVar" value="Page value" scope="page"/>			<!-- scope default값은 page이기때문에 생략해도 가능. -->
+<c:set var="scopeVar" value="Request value" scope="request"/>
+<c:set var="scopeVar" value="Session value" scope="session"/>
+<c:set var="scopeVar" value="Application value" scope="application"/>
+<body>
+	<ul>
+		<li>scopeVar : ${scopeVar }</li>
+		<li>requestScope.scopeVar : ${requestScope.scopeVar }</li>
+		<li>sessionScope.scopeVar : ${sessionScope.scopeVar }</li>
+		<li>applicationScope.scopeVar : ${applicationScope.scopeVar }</li>
+	</ul>
+		<c:remove var="scopeVar" scope="session"/>
+	<ul>
+		<li>scopeVar : ${scopeVar }</li>
+		<li>requestScope.scopeVar : ${requestScope.scopeVar }</li>
+		<li>sessionScope.scopeVar : ${sessionScope.scopeVar }</li>
+		<li>applicationScope.scopeVar : ${applicationScope.scopeVar }</li>
+	</ul>
+
+	<c:remove var="scopeVar"/>
+	<ul>
+		<li>scopeVar : ${scopeVar }</li>
+		<li>requestScope.scopeVar : ${requestScope.scopeVar }</li>
+		<li>sessionScope.scopeVar : ${sessionScope.scopeVar }</li>
+		<li>applicationScope.scopeVar : ${applicationScope.scopeVar }</li>
+	</ul>
+	</body>
+```
+
+-   Set : Scope(저장영역)에 값을 추가할 수 있도록 해줍니다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+	<!-- 변수 선언 -->
+	<c:set var="aVar" value="200"/>
+	<c:set var="elVar" value="${aVar mod 7 }"/>
+	<c:set var="expVar" value="<%= new Date() %>"/>
+	<c:set var="tagVar">태그내 설정</c:set>
+
+	<h3>변수 출력</h3>
+	${pageScope.aVar }<br>${elVar }<br>${expVar }<br>${tagVar }<br>
+
+	<h4>자바빈즈 생성자 사용</h4>
+	<c:set var="personVar1" value='<%=new Person("지수", 22) %>' scope="request"/>
+	<ul>
+		<li>이름: ${requestScope.personVar1.name }</li>
+		<li>나이: ${personVar1.age}</li>
+	</ul>
+
+	<h4>자바빈즈 target, property 사용</h4>
+	<c:set var="personVar2" value="<%=new Person() %>" scope="request"/>
+	<c:set target="${personVar2 }" property="name" value="정약용" />
+	<c:set target="${personVar2 }" property="age" value="60"/>
+	<ul>
+		<li>이름: ${requestScope.personVar2.name }</li>
+		<li>나이: ${personVar2.age}</li>
+	</ul>
+
+	<h4>List</h4>
+	<%
+		ArrayList<Person> pList = new ArrayList<>();
+		pList.add(new Person("제임스",55));
+		pList.add(new Person("william",60));
+	%>
+	<c:set var="personList" value="<%=pList %>" scope="request"/>
+	<ul>
+		<li>이름: ${requestScope.personList[0].name }</li>
+		<li>나이: ${personList[0].age}</li>
+	</ul>
+
+	<h4>Map</h4>
+	<%
+		Map<String, Person> pMap = new HashMap<>();
+		pMap.put("personArgs1", new Person("superman",65));
+		pMap.put("personArgs2", new Person("batman",55));
+	%>
+	<c:set var="personMap" value="<%=pMap %>" scope="request"/>
+	<ul>
+		<li>이름: ${requestScope.personMap.personArgs2.name }</li>
+		<li>나이: ${personMap.personArgs2.age}</li>
+	</ul>
+	</body>
+```
+
+-   Url : url을 생성해주는 기능을 할 수 있습니다. 하지만 그냥 생성해주는 것이 아니라 contextPath를 자동으로 붙여주고 url을 생성하는 것이기 때문에 서버에 올려서 contextPath가 달라져도 url을 수정할 필요가 없어집니다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<body>
+	<h4>url로 링크</h4>
+	<c:url var="url" value="/11JSTL/include/OtherPage.jsp">
+		<c:param name="param1" value="수박" />
+		<c:param name="param2" value="당근" />
+	</c:url>
+	<a href="${url}">other page</a>
+	</body>
+```
+
+## Formatting
+
+-   데이터 타입들을 자신이 원하는 종류로 변경할수 있다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<body>
+<h4>날씨 포맷</h4>
+	full:<fmt:formatDate value="${today }" type="date" dateStyle="full"/><br>
+	short:<fmt:formatDate value="${today }" type="date" dateStyle="short"/><br>
+	long:<fmt:formatDate value="${today }" type="date" dateStyle="long"/><br>
+	default:<fmt:formatDate value="${today }" type="date" dateStyle="default"/><br>
+
+	<h4>시간 포맷</h4>
+	full:<fmt:formatDate value="${today }" type="time" timeStyle="full"/><br>
+	short:<fmt:formatDate value="${today }" type="time" timeStyle="short"/><br>
+	long:<fmt:formatDate value="${today }" type="time" timeStyle="long"/><br>
+	default:<fmt:formatDate value="${today }" type="time" timeStyle="default"/><br>
+
+	<h4>날짜 / 시간 표시</h4>
+	<fmt:formatDate value="${today }" type="both" dateStyle="full" timeStyle="full"/><br>
+	<fmt:formatDate value="${today }" type="both" pattern="yyyy-MM-dd hh:mm:ss"/>
+	</body>
+```
+
+## Function
+
+-   문자열을 처리하는 함수를 제공합니다.
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<body>
+	length:	${fn:length('123123')}<br/>
+	toUpperCase: ${fn:toUpperCase('sss')}<br/>
+	toLowerCase: ${fn:toLowerCase('SSS') }<br/>
+	substring: ${fn:substring("check",1,3) }<br/>
+	substringAfter: ${fn:substringAfter('applepie','pp') }<br/>
+	substringBefore: ${fn:substringBefore('applepie','pp') }<br/>
+	trim: ${fn:trim(' apple pie ')}<br/>
+	replace: ${fn:replace('apple phone','apple','samsung')}<br/>
+	indexOf: ${fn:indexOf('applepie','e') }<br/>
+	startsWith: ${fn:startsWith('applepie','e') }<br/>
+	endsWith: ${fn:endsWith('applpie','e') }<br/>
+	contains: ${fn:contains('applEpiE','e') }<br/>
+	containsIgnoreCase: ${fn:containsIgnoreCase('applEpiE','e') }<br/>
+	<c:set var='list' value="${fn:split('a,p,p,l,e,p,i,e',',') }" />
+	split:
+	<c:forEach var="l" items="${list}" varStatus="stat" >
+	${l}
+	</c:forEach>
+	<br/>
+	join: ${fn:join(list,',')}<br/>
+	escapeXml: ${fn:escapeXml('<strong>is delicious.</strong>') }<br/>
+	</body>
+```
+
+## XML
+
+-   JSP 중심의 XML 문서 작성 및 조작 방법을 제공한다
+
+```jsp
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml" %>
+<body>
+	<c:import url="./include/FruitList.xml" var="fruitlist" charEncoding="UTF-8" />
+	${fruitlist }
+	<x:parse xml="${fruitlist }" var ="flist" /><br>
+	<x:out select="$flist/fruitlist/fruit[1]/name"/><br>
+	<x:out select="$flist/fruitlist/fruit[1]/from"/><br>
+	<x:out select="$flist/fruitlist/fruit[1]/price"/><br>
+	</body>
+```
