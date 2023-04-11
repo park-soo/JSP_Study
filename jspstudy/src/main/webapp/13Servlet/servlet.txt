@@ -1,0 +1,8 @@
+Servlet 작성 규칙
+- import javax.servlet
+- public
+- httpServlet 상속
+- doGet 또는 doPost 반드시 오버라이딩
+
+1. web.xml servlet 설정
+2. @ annotation 설정 - 컴파일러한테 알려주는 주석

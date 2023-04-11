@@ -547,3 +547,15 @@ jsp에서 빈번하게 사용하는 반복문 조건문을 처리하는 동작�
 	<x:out select="$flist/fruitlist/fruit[1]/price"/><br>
 	</body>
 ```
+
+## Servlet
+
+Servlet 작성 규칙
+
+-   import javax.servlet
+-   public
+-   httpServlet 상속
+-   doGet 또는 doPost 반드시 오버라이딩
+
+1. web.xml servlet 설정
+2. @ annotation 설정 - 컴파일러한테 알려주는 주석
