@@ -559,3 +559,5 @@ Servlet 작성 규칙
 
 1. web.xml servlet 설정
 2. @ annotation 설정 - 컴파일러한테 알려주는 주석
+
+## SMTP(Simple Mail Transfer Protocol)
